@@ -114,9 +114,32 @@ function Home() {
           </Table>
         </div>
 
+        {/* Closed Tickets – YTD 2025 */}
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+          <h2 className="text-lg font-bold text-[#044610] mb-4">Closed Tickets – YTD 2025</h2>
+          <Table className="text-sm">
+            <TableHeader>
+              <TableRow className="bg-gray-100 text-left">
+                <TableHead>Ticket No</TableHead>
+                <TableHead>Subject</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>330001</TableCell>
+                <TableCell>Fixed login bug</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>330002</TableCell>
+                <TableCell>Data sync issue resolved</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+
         {/* Open Tickets */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-          <h2 className="text-lg font-bold text-[#044610] mb-4">Open Tickets</h2>
+          <h2 className="text-lg font-bold text-[#044610] mb-4">Closed Tickets YTD 2025</h2>
           <Table className="text-sm">
             <TableHeader>
               <TableRow className="bg-gray-100 text-left">
