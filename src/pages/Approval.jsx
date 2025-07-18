@@ -24,7 +24,7 @@ const tickets = Array.from({ length: 25 }).map((_, i) => ({
   ticketNo: `33125${i}`,
   subject: `Subject #${i + 1}`,
   dateCreated: `2025-07-${(15 + i) % 30 + 1}`.padStart(10, '0'),
-  status: i % 2 === 0 ? 'For Approval' : 'Closed',
+  status: 'For Approval',
   category: i % 2 === 0 ? 'Issue DM/CM' : 'Access Request',
   urgency: i % 2 === 0 ? 'Urgent' : 'Normal',
   from: i % 2 === 0 ? 'Jhune Melchor Salavedra' : 'Katelene Paloma',

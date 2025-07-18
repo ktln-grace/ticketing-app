@@ -23,7 +23,7 @@ import { FilterIcon, CalendarIcon } from 'lucide-react';
 const tickets = Array.from({ length: 45 }).map((_, i) => ({
   ticketNo: `${330000 + i}`,
   subject: `Ticket Subject ${i + 1}`,
-  dateApproved: `2025-07-${(i % 30) + 1}`.padStart(10, '0'),
+  dateApproved: `2025-07-${(15 + i) % 30 + 1}`.padStart(10, '0'),
   status: ['Open', 'In Progress', 'Closed'][i % 3],
   urgency: i % 2 === 0 ? 'Normal' : 'Urgent',
   category: i % 2 === 0 ? 'Issue DM/CM' : 'Access Request',
