@@ -22,7 +22,7 @@ function Tickets() {
   const [currentPage, setCurrentPage] = useState(1);
   const ticketsPerPage = 10;
 
-  // 📦 Fetch tickets based on status (tab)
+  // Fetch tickets based on status (tab)
   useEffect(() => {
     const fetchTickets = async () => {
       try {
@@ -37,10 +37,7 @@ function Tickets() {
     fetchTickets();
   }, [activeTab]);
 
-  const filteredTickets = tickets; // disable filters for now
-
-
-  /* 🔍 Apply filters
+  // Filter logic
   const filteredTickets = tickets.filter(ticket => {
     const matchesUrgency = selectedUrgency ? ticket.urgency === selectedUrgency : true;
     const matchesDate = selectedDate
@@ -53,7 +50,7 @@ function Tickets() {
       : true;
     return matchesUrgency && matchesDate && matchesSearch;
   });
-*/
+
   const totalPages = Math.ceil(filteredTickets.length / ticketsPerPage);
   const paginatedTickets = filteredTickets.slice(
     (currentPage - 1) * ticketsPerPage,
@@ -64,16 +61,27 @@ function Tickets() {
     <main className="flex-1 p-6">
       {/* Tabs & Filters */}
       <div className="flex flex-wrap justify-between gap-4 mb-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val)}>
           <TabsList className="flex gap-3 flex-wrap">
-            <TabsTrigger value="APPROVED" className="tab-trigger">Approved</TabsTrigger>
-            <TabsTrigger value="ASSIGNED" className="tab-trigger">Assigned</TabsTrigger>
-            <TabsTrigger value="CLOSED" className="tab-trigger">Done</TabsTrigger>
+            {['APPROVED', 'ASSIGNED', 'CLOSED'].map((tabKey) => (
+              <TabsTrigger
+                key={tabKey}
+                value={tabKey}
+                className={`px-4 py-2 rounded-md border transition-colors ${
+                  activeTab === tabKey
+                    ? 'bg-[#42A841] text-white font-semibold'
+                    : 'bg-white text-gray-800 hover:bg-gray-100'
+                }`}
+              >
+                {tabKey.charAt(0) + tabKey.slice(1).toLowerCase()}
+              </TabsTrigger>
+            ))}
           </TabsList>
         </Tabs>
 
-        {/* Search + Date */}
+
         <div className="flex gap-3 items-center">
+          {/* Search Field */}
           <div className="relative">
             <SearchIcon className="absolute left-3 top-2.5 text-gray-400" size={18} />
             <Input
@@ -88,6 +96,21 @@ function Tickets() {
             />
           </div>
 
+          {/* Urgency Filter */}
+          <select
+            value={selectedUrgency}
+            onChange={(e) => {
+              setSelectedUrgency(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="px-3 py-2 border rounded-xl shadow-sm text-sm bg-white"
+          >
+            <option value="">All Urgencies</option>
+            <option value="Urgent">Urgent</option>
+            <option value="Normal">Normal</option>
+          </select>
+
+          {/* Date Dropdown */}
           <div className="relative">
             <Button
               variant="outline"
@@ -116,42 +139,44 @@ function Tickets() {
 
       {/* Table */}
       <div className="overflow-x-auto bg-white border shadow-sm rounded-xl p-4">
-        <Table className="min-w-full text-sm text-center">
-          <TableHeader>
-            <TableRow className="bg-[#044610] text-white">
-              <TableHead>Ticket No</TableHead>
-              <TableHead>Subject</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>From</TableHead>
-              <TableHead>Urgency</TableHead>
-              <TableHead>Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedTickets.map((ticket, index) => (
-              <TableRow key={index} className="hover:bg-gray-100">
-                <TableCell>{ticket.ticket_no}</TableCell>
-                <TableCell>{ticket.subject}</TableCell>
-                <TableCell>
-                  <span className="bg-blue-700 text-white text-xs px-2 py-1 rounded-md">
-                    {ticket.status}
-                  </span>
-                </TableCell>
-                <TableCell>{ticket.employee_name}</TableCell>
-                <TableCell>{ticket.assigned_to || '-'}</TableCell>
-                <TableCell>
-                  <span className={`text-xs px-2 py-1 rounded-md ${
-                    ticket.urgency === 'Urgent' ? 'bg-red-600 text-white' : 'bg-yellow-300 text-black'
-                  }`}>
-                    {ticket.urgency || 'Normal'}
-                  </span>
-                </TableCell>
-                <TableCell>{new Date(ticket.date_assigned || ticket.date_approved || ticket.Log || '').toLocaleString()}</TableCell>
-                <TableCell>{ticket.attachment_count > 0 ? `📎 (${ticket.attachment_count})` : '-'}</TableCell>
+        {paginatedTickets.length === 0 ? (
+          <div className="text-center py-10 text-gray-500">No tickets found for this tab.</div>
+        ) : (
+          <Table className="min-w-full text-sm text-center">
+            <TableHeader>
+              <TableRow className="bg-[#044610] text-white">
+                <TableHead>Ticket No</TableHead>
+                <TableHead>Subject</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>From</TableHead>
+                <TableHead>Urgency</TableHead>
+                <TableHead>Date</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {paginatedTickets.map((ticket, index) => (
+                <TableRow key={index} className="hover:bg-gray-100">
+                  <TableCell>{ticket.ticket_no}</TableCell>
+                  <TableCell>{ticket.subject}</TableCell>
+                  <TableCell>
+                    <span className="bg-blue-700 text-white text-9px px-2 py-1 rounded-md">
+                      {ticket.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>{ticket.employee_name}</TableCell>
+                  <TableCell>
+                    <span className={`text-9px px-2 py-1 rounded-md ${
+                      ticket.urgency === 'Urgent' ? 'bg-red-600 text-white' : 'bg-yellow-300 text-black'
+                    }`}>
+                      {ticket.urgency || 'Normal'}
+                    </span>
+                  </TableCell>
+                  <TableCell>{new Date(ticket.date_approved || ticket.Log || '').toLocaleString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
 
         {/* Pagination */}
         <div className="flex justify-between items-center p-4 border-t text-sm text-gray-700">

@@ -9,7 +9,11 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { Textarea } from '../components/ui/textarea';
-import { PaperclipIcon } from 'lucide-react';
+import { 
+  PaperclipIcon,
+  UserIcon,
+  SearchIcon,
+ } from 'lucide-react';
 
 function Create() {
   const [formData, setFormData] = useState({
@@ -44,6 +48,27 @@ function Create() {
 
   return (
     <main className="flex-1 p-6">
+            {/* Header */}
+          <div className="flex justify-between items-center flex-wrap gap-6 mb-4">
+            <h1 className="text-4xl font-bold text-[#000000]">CREATE A TICKET</h1>
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="relative w-72 gap-1">
+                <SearchIcon className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                <Input
+                  placeholder="Search Ticket No. or Subject"
+                  className="pl-10 pr-3 py-2 rounded-xl border border-gray-300 shadow-sm w-full"
+                />
+              </div>
+              <div className="flex items-center gap-1 font-medium text-gray-800 bg-white rounded-xl border w-70 px-3 py-2 border-gray-300 shadow-sm">
+                <UserIcon size={18} />
+                <span>Katelene Grace S. Paloma</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <hr className="border border-gray-300 mb-6" />
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-md border border-gray-200 p-8 space-y-6">
