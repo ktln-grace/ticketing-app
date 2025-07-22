@@ -1,5 +1,6 @@
 {
   "name": "ticketing-app",
+  "homepage": "/gibco_ticket/build",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

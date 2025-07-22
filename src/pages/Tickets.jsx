@@ -1,12 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '../components/ui/input';
-import {
-  Select,
-  SelectTrigger,
-  SelectItem,
-  SelectContent,
-  SelectValue,
-} from '../components/ui/select';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import {
@@ -17,36 +10,50 @@ import {
   TableHeader,
   TableBody,
 } from '../components/ui/table';
-import { FilterIcon, CalendarIcon } from 'lucide-react';
-
-/* ✅ Sample Ticket Data */
-const tickets = Array.from({ length: 45 }).map((_, i) => ({
-  ticketNo: `${330000 + i}`,
-  subject: `Ticket Subject ${i + 1}`,
-  dateApproved: `2025-07-${(15 + i) % 30 + 1}`.padStart(10, '0'),
-  status: ['Open', 'In Progress', 'Closed'][i % 3],
-  urgency: i % 2 === 0 ? 'Normal' : 'Urgent',
-  category: i % 2 === 0 ? 'Issue DM/CM' : 'Access Request',
-  from: i % 2 === 0 ? 'Jhune Melchor' : 'Katelene Paloma',
-}));
+import { CalendarIcon, SearchIcon } from 'lucide-react';
 
 function Tickets() {
-  const [activeTab, setActiveTab] = useState('Open');
+  const [tickets, setTickets] = useState([]);
+  const [activeTab, setActiveTab] = useState('APPROVED');
   const [selectedUrgency, setSelectedUrgency] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const ticketsPerPage = 5;
+  const ticketsPerPage = 10;
 
-  // ✅ Filtered ticket set
-  const filteredTickets = tickets.filter((ticket) => {
-    const matchesTab = ticket.status === activeTab;
+  // 📦 Fetch tickets based on status (tab)
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const response = await fetch(`/gibco_ticket/api/get-tickets.php?status=${activeTab}`);
+        const data = await response.json();
+        setTickets(data || []);
+        setCurrentPage(1);
+      } catch (error) {
+        console.error('Error fetching tickets:', error);
+      }
+    };
+    fetchTickets();
+  }, [activeTab]);
+
+  const filteredTickets = tickets; // disable filters for now
+
+
+  /* 🔍 Apply filters
+  const filteredTickets = tickets.filter(ticket => {
     const matchesUrgency = selectedUrgency ? ticket.urgency === selectedUrgency : true;
-    const matchesDate = selectedDate ? ticket.dateApproved.startsWith(selectedDate) : true;
-    return matchesTab && matchesUrgency && matchesDate;
+    const matchesDate = selectedDate
+      ? (ticket.date_approved || ticket.date_assigned || ticket.Log || '').startsWith(selectedDate)
+      : true;
+    const matchesSearch = searchTerm
+      ? (ticket.subject?.toLowerCase().includes(searchTerm) ||
+         ticket.ticket_no?.toLowerCase().includes(searchTerm) ||
+         ticket.employee_name?.toLowerCase().includes(searchTerm))
+      : true;
+    return matchesUrgency && matchesDate && matchesSearch;
   });
-
+*/
   const totalPages = Math.ceil(filteredTickets.length / ticketsPerPage);
   const paginatedTickets = filteredTickets.slice(
     (currentPage - 1) * ticketsPerPage,
@@ -55,42 +62,42 @@ function Tickets() {
 
   return (
     <main className="flex-1 p-6">
-      {/* Tabs + Buttons */}
-      <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
-        <Tabs defaultValue="Open" value={activeTab} onValueChange={(value) => {
-          setActiveTab(value);
-          setCurrentPage(1);
-        }} className="flex-grow">
-          <TabsList className="flex gap-3 p-0">
-            <TabsTrigger value="Open" className="px-4 py-2 rounded-full font-medium text-gray-700 hover:bg-gray-100 data-[state=active]:bg-[#42A841] data-[state=active]:text-white">
-              Open
-            </TabsTrigger>
-            <TabsTrigger value="In Progress" className="px-4 py-2 rounded-full font-medium text-gray-700 hover:bg-gray-100 data-[state=active]:bg-[#42A841] data-[state=active]:text-white">
-              In Progress
-            </TabsTrigger>
-            <TabsTrigger value="Closed" className="px-4 py-2 rounded-full font-medium text-gray-700 hover:bg-gray-100 data-[state=active]:bg-[#42A841] data-[state=active]:text-white">
-              Closed
-            </TabsTrigger>
+      {/* Tabs & Filters */}
+      <div className="flex flex-wrap justify-between gap-4 mb-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="flex gap-3 flex-wrap">
+            <TabsTrigger value="APPROVED" className="tab-trigger">Approved</TabsTrigger>
+            <TabsTrigger value="ASSIGNED" className="tab-trigger">Assigned</TabsTrigger>
+            <TabsTrigger value="CLOSED" className="tab-trigger">Done</TabsTrigger>
           </TabsList>
         </Tabs>
 
-        <div className="flex gap-2">
+        {/* Search + Date */}
+        <div className="flex gap-3 items-center">
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-2.5 text-gray-400" size={18} />
+            <Input
+              type="text"
+              placeholder="Search ticket, subject, or name"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value.toLowerCase());
+                setCurrentPage(1);
+              }}
+              className="pl-10 pr-3 py-2 rounded-xl border border-gray-300 shadow-sm w-64"
+            />
+          </div>
 
-
-          {/* Date filter */}
           <div className="relative">
             <Button
               variant="outline"
-              onClick={() => {
-                setShowDateDropdown((prev) => !prev);
-                setShowFilterDropdown(false);
-              }}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+              onClick={() => setShowDateDropdown(prev => !prev)}
+              className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
             >
               <CalendarIcon size={16} /> Date
             </Button>
             {showDateDropdown && (
-              <div className="absolute right-0 top-full mt-2 w-64 bg-white border rounded-lg shadow-lg p-4">
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white border rounded-lg shadow-lg p-4 z-10">
                 <Input
                   type="date"
                   value={selectedDate}
@@ -107,40 +114,40 @@ function Tickets() {
         </div>
       </div>
 
-      {/* Table and pagination */}
-      <div className="overflow-x-auto rounded-xl bg-white shadow-sm border border-gray-300 p-4">
+      {/* Table */}
+      <div className="overflow-x-auto bg-white border shadow-sm rounded-xl p-4">
         <Table className="min-w-full text-sm text-center">
           <TableHeader>
-            <TableRow className="bg-[#044610] text-white rounded-lg">
-              <TableHead>Ticket No.</TableHead>
+            <TableRow className="bg-[#044610] text-white">
+              <TableHead>Ticket No</TableHead>
               <TableHead>Subject</TableHead>
-              <TableHead>Date Approved</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Urgency</TableHead>
-              <TableHead>Category</TableHead>
               <TableHead>From</TableHead>
+              <TableHead>Urgency</TableHead>
+              <TableHead>Date</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedTickets.map((ticket, index) => (
-              <TableRow key={index} className="bg-white hover:bg-gray-100 rounded-lg">
-                <TableCell>{ticket.ticketNo}</TableCell>
+              <TableRow key={index} className="hover:bg-gray-100">
+                <TableCell>{ticket.ticket_no}</TableCell>
                 <TableCell>{ticket.subject}</TableCell>
-                <TableCell>{ticket.dateApproved}</TableCell>
                 <TableCell>
                   <span className="bg-blue-700 text-white text-xs px-2 py-1 rounded-md">
                     {ticket.status}
                   </span>
                 </TableCell>
+                <TableCell>{ticket.employee_name}</TableCell>
+                <TableCell>{ticket.assigned_to || '-'}</TableCell>
                 <TableCell>
                   <span className={`text-xs px-2 py-1 rounded-md ${
-                    ticket.urgency === 'Urgent' ? 'bg-red-700 text-white' : 'bg-yellow-300 text-black'
+                    ticket.urgency === 'Urgent' ? 'bg-red-600 text-white' : 'bg-yellow-300 text-black'
                   }`}>
-                    {ticket.urgency}
+                    {ticket.urgency || 'Normal'}
                   </span>
                 </TableCell>
-                <TableCell>{ticket.category}</TableCell>
-                <TableCell>{ticket.from}</TableCell>
+                <TableCell>{new Date(ticket.date_assigned || ticket.date_approved || ticket.Log || '').toLocaleString()}</TableCell>
+                <TableCell>{ticket.attachment_count > 0 ? `📎 (${ticket.attachment_count})` : '-'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -153,10 +160,10 @@ function Tickets() {
             {Math.min(currentPage * ticketsPerPage, filteredTickets.length)} of {filteredTickets.length} entries
           </span>
           <div className="flex gap-1 items-center">
-            <button onClick={() => setCurrentPage(1)} className="px-2 py-1 rounded-md border hover:bg-gray-100">First</button>
-            <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} className="px-2 py-1 rounded-md border hover:bg-gray-100">Previous</button>
-            <button className="px-2 py-1 rounded-md border bg-[#42A841] text-white font-semibold">{currentPage}</button>
-            <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} className="px-2 py-1 rounded-md border hover:bg-gray-100">Next</button>
+            <button onClick={() => setCurrentPage(1)} className="px-2 py-1 border rounded hover:bg-gray-100">First</button>
+            <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} className="px-2 py-1 border rounded hover:bg-gray-100">Previous</button>
+            <button className="px-2 py-1 border rounded bg-[#42A841] text-white font-medium">{currentPage}</button>
+            <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} className="px-2 py-1 border rounded hover:bg-gray-100">Next</button>
             <button onClick={() => setCurrentPage(totalPages)} className="px-2 py-1 rounded-md border hover:bg-gray-100">Last</button>
           </div>
         </div>
