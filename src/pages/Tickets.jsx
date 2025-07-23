@@ -22,11 +22,11 @@ function Tickets() {
   const [currentPage, setCurrentPage] = useState(1);
   const ticketsPerPage = 10;
 
-  // Fetch tickets based on status (tab)
+  // ✅ Fetch tickets based on selected status
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const response = await fetch(`/gibco_ticket/api/get-tickets.php?status=${activeTab}`);
+        const response = await fetch(`http://10.10.20.59/gibco_ticket/api/get-tickets.php?status=${activeTab}`);
         const data = await response.json();
         setTickets(data || []);
         setCurrentPage(1);
@@ -37,16 +37,18 @@ function Tickets() {
     fetchTickets();
   }, [activeTab]);
 
-  // Filter logic
+  // ✅ Filter logic
   const filteredTickets = tickets.filter(ticket => {
     const matchesUrgency = selectedUrgency ? ticket.urgency === selectedUrgency : true;
     const matchesDate = selectedDate
-      ? (ticket.date_approved || ticket.date_assigned || ticket.Log || '').startsWith(selectedDate)
+      ? (ticket.date_approved || ticket.date_assigned || ticket.datetime_closed || '').startsWith(selectedDate)
       : true;
     const matchesSearch = searchTerm
-      ? (ticket.subject?.toLowerCase().includes(searchTerm) ||
-         ticket.ticket_no?.toLowerCase().includes(searchTerm) ||
-         ticket.employee_name?.toLowerCase().includes(searchTerm))
+      ? (
+          ticket.subject?.toLowerCase().includes(searchTerm) ||
+          ticket.ticket_no?.toLowerCase().includes(searchTerm) ||
+          ticket.employee_name?.toLowerCase().includes(searchTerm)
+        )
       : true;
     return matchesUrgency && matchesDate && matchesSearch;
   });
@@ -78,7 +80,6 @@ function Tickets() {
             ))}
           </TabsList>
         </Tabs>
-
 
         <div className="flex gap-3 items-center">
           {/* Search Field */}
@@ -137,7 +138,7 @@ function Tickets() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Ticket Table */}
       <div className="overflow-x-auto bg-white border shadow-sm rounded-xl p-4">
         {paginatedTickets.length === 0 ? (
           <div className="text-center py-10 text-gray-500">No tickets found for this tab.</div>
@@ -160,7 +161,7 @@ function Tickets() {
                   <TableCell>{ticket.subject}</TableCell>
                   <TableCell>
                     <span className="bg-blue-700 text-white text-9px px-2 py-1 rounded-md">
-                      {ticket.status}
+                      {activeTab.charAt(0) + activeTab.slice(1).toLowerCase()}
                     </span>
                   </TableCell>
                   <TableCell>{ticket.employee_name}</TableCell>
@@ -171,7 +172,14 @@ function Tickets() {
                       {ticket.urgency || 'Normal'}
                     </span>
                   </TableCell>
-                  <TableCell>{new Date(ticket.date_approved || ticket.Log || '').toLocaleString()}</TableCell>
+                  <TableCell>
+                    {new Date(
+                      ticket.date_approved ||
+                      ticket.date_assigned ||
+                      ticket.datetime_closed ||
+                      ''
+                    ).toLocaleString()}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -196,5 +204,5 @@ function Tickets() {
     </main>
   );
 }
-
+s
 export default Tickets;
