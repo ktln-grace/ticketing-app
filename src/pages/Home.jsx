@@ -46,9 +46,12 @@ function Home() {
       .then(data => setDepartments(data))
       .catch(err => console.error('Department error:', err));
 
-    fetch('/gibco_ticket/api/handler-summary.php')
+    fetch('http://10.10.20.59/gibco_ticket/api/handler-summary.php')
       .then(res => res.json())
-      .then(data => setHandlers(data))
+      .then(data => {
+        console.log('Handler data:', data); // Confirm shape
+        setHandlers(data);
+      })
       .catch(err => console.error('Handler error:', err));
 
     fetch('/gibco_ticket/api/closed-july.php')
@@ -95,7 +98,7 @@ function Home() {
     .slice(0, 5);
 
   return (
-    <main className="p-6 space-y-5">
+    <main className="p-2 space-y-5">
       {/* Header */}
       <div className="flex justify-between items-center flex-wrap gap-6 mb-4">
         <h1 className="text-4xl font-bold text-[#000000]">GIBCO TICKETING SYSTEM</h1>
@@ -164,17 +167,20 @@ function Home() {
             <TableHeader>
               <TableRow className="bg-gray-100 text-left">
                 <TableHead>Handler</TableHead>
-                <TableHead>Total</TableHead>
+                <TableHead>Tickets</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {filteredHandlers.map((h, i) => (
-                <TableRow key={i}>
-                  <TableCell>{h.handler}</TableCell>
-                  <TableCell>{Number(h.count).toLocaleString()}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+              <TableBody>
+                {handlers
+                  .filter(h => h.handler) // skip empty handlers
+                  .slice(0, 5) // limit to top 5 if needed
+                  .map((h, i) => (
+                    <TableRow key={i}>
+                      <TableCell>{h.handler}</TableCell>
+                      <TableCell>{Number(h.count).toLocaleString()}</TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
           </Table>
         </div>
 

@@ -60,7 +60,7 @@ function Approval() {
   );
 
   return (
-    <main className="flex-1 p-6">
+    <main className="flex-1 p-2">
       {/* Filter Controls */}
             <div className="flex flex-wrap justify-between gap-4 mb-4">
       

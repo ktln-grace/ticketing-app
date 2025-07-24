@@ -111,7 +111,7 @@ export default function TicketingSystem() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 md:p-10">
+        <main className="flex-1 p-2 md:p-6">
 
           {/* Routes */}
           <Routes>

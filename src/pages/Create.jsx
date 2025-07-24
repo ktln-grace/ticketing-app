@@ -47,7 +47,7 @@ function Create() {
   };
 
   return (
-    <main className="flex-1 p-6">
+    <main className="flex-1 p-2">
             {/* Header */}
           <div className="flex justify-between items-center flex-wrap gap-6 mb-4">
             <h1 className="text-4xl font-bold text-[#000000]">CREATE A TICKET</h1>
