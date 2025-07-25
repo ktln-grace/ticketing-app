@@ -165,7 +165,7 @@ function Home() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {departments.slice(0, 5).map((d, i) => (
+              {departments.slice(1, 9).map((d, i) => (
                 <TableRow key={i}>
                   <TableCell>{d.department}</TableCell>
                   <TableCell>{Number(d.count).toLocaleString()}</TableCell>
