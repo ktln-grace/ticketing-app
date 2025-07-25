@@ -65,6 +65,20 @@ function Home() {
       .catch(err => console.error('Closed YTD error:', err));
   }, []);
 
+  useEffect(() => {
+  const fetchHandlerStats = async () => {
+    try {
+      const response = await fetch('/gibco_ticket/api/it-handlers.php');
+      const data = await response.json();
+      setHandlers(data);
+    } catch (error) {
+      console.error('Error loading handler stats:', error);
+    }
+  };
+
+  fetchHandlerStats();
+}, []);
+
   const summaryCards = [
     {
       label: 'All Tickets',
@@ -97,6 +111,7 @@ function Home() {
     .filter(h => allowedHandlers.includes(h.handler))
     .slice(0, 5);
 
+  
   return (
     <main className="p-2 space-y-5">
       {/* Header */}
@@ -167,20 +182,22 @@ function Home() {
             <TableHeader>
               <TableRow className="bg-gray-100 text-left">
                 <TableHead>Handler</TableHead>
-                <TableHead>Tickets</TableHead>
+                <TableHead>Pending</TableHead>
+                <TableHead>Closed</TableHead>
               </TableRow>
             </TableHeader>
-              <TableBody>
-                {handlers
-                  .filter(h => h.handler) // skip empty handlers
-                  .slice(0, 5) // limit to top 5 if needed
-                  .map((h, i) => (
-                    <TableRow key={i}>
-                      <TableCell>{h.handler}</TableCell>
-                      <TableCell>{Number(h.count).toLocaleString()}</TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
+            <TableBody>
+              {handlers
+                .filter(h => h.assigned_to) // or h.handler if you renamed
+                .slice(0, 8) // Show top 8 if preferred
+                .map((h, i) => (
+                  <TableRow key={i}>
+                    <TableCell>{h.assigned_to}</TableCell>
+                    <TableCell className="text-yellow-600 font-medium text-center">{Number(h.pending_tickets).toLocaleString()}</TableCell>
+                    <TableCell className="text-green-700 font-medium text-center">{Number(h.closed_tickets).toLocaleString()}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
           </Table>
         </div>
 
