@@ -1,0 +1,97 @@
+import React, { useState, useEffect } from 'react';
+
+const TicketViewer = () => {
+  const [tickets, setTickets] = useState([]);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [activeTab, setActiveTab] = useState('OPEN'); // or CLOSED, ASSIGNED, etc.
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const response = await fetch(
+          `http://10.10.20.59/gibco_ticket/api/get-tickets.php?status=${activeTab}`
+        );
+        const data = await response.json();
+        setTickets(data || []);
+      } catch (error) {
+        console.error('Error fetching tickets:', error);
+      }
+    };
+    fetchTickets();
+  }, [activeTab]);
+
+  const handleTicketClick = (ticket) => {
+    setSelectedTicket(ticket);
+  };
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h2>Tickets - {activeTab}</h2>
+      {/* Tabs */}
+      <div style={{ marginBottom: '10px' }}>
+        {['OPEN', 'CLOSED', 'ASSIGNED', 'REJECTED'].map((tab) => (
+          <button
+            key={tab}
+            style={{
+              marginRight: '10px',
+              padding: '6px 12px',
+              backgroundColor: activeTab === tab ? '#007bff' : '#e0e0e0',
+              color: activeTab === tab ? '#fff' : '#000',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Ticket Table */}
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr style={{ backgroundColor: '#f5f5f5' }}>
+            <th style={{ padding: '8px', border: '1px solid #ddd' }}>Ticket No</th>
+            <th style={{ padding: '8px', border: '1px solid #ddd' }}>Subject</th>
+            <th style={{ padding: '8px', border: '1px solid #ddd' }}>Employee</th>
+            <th style={{ padding: '8px', border: '1px solid #ddd' }}>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tickets.map((ticket) => (
+            <tr key={ticket.ticket_no}>
+              <td style={{ padding: '8px', border: '1px solid #ddd' }}>{ticket.ticket_no}</td>
+              <td
+                onClick={() => handleTicketClick(ticket)}
+                style={{ padding: '8px', border: '1px solid #ddd', color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                {ticket.subject}
+              </td>
+              <td style={{ padding: '8px', border: '1px solid #ddd' }}>{ticket.employee_name}</td>
+              <td style={{ padding: '8px', border: '1px solid #ddd' }}>{ticket.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Details Panel */}
+      {selectedTicket && (
+        <div style={{ marginTop: '30px', padding: '20px', border: '1px solid #ccc', backgroundColor: '#f9f9f9' }}>
+          <h3>Details for Ticket #{selectedTicket.ticket_no}</h3>
+          <p><strong>Subject:</strong> {selectedTicket.subject}</p>
+          <p><strong>Employee:</strong> {selectedTicket.employee_name}</p>
+          <p><strong>Status:</strong> {selectedTicket.status}</p>
+          <p><strong>Description:</strong> {selectedTicket.description}</p>
+          <p><strong>Date Submitted:</strong> {selectedTicket.date_submitted}</p>
+          {/* Add more details if available */}
+          <button onClick={() => setSelectedTicket(null)} style={{ marginTop: '10px', padding: '6px 12px', cursor: 'pointer' }}>
+            Close
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TicketViewer;

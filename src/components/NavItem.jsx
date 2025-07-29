@@ -1,22 +1,30 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { FaHome, FaFileAlt, FaTable, FaEdit, FaCalculator, FaCreditCard, FaBan, FaSave } from 'react-icons/fa';
 
-export default function NavItem({ icon: Icon, label, path }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const isActive = location.pathname === path;
+const Sidebar = () => {
+  const menuItems = [
+    { label: 'Dashboard', icon: <FaHome /> },
+    { label: 'New Cash Voucher', icon: <FaFileAlt /> },
+    { label: 'CV Table', icon: <FaTable /> },
+    { label: 'CV with Entries', icon: <FaEdit /> },
+    { label: 'Summary per GL Accounts', icon: <FaCalculator /> },
+    { label: 'CV with Online Payment', icon: <FaCreditCard /> },
+    { label: 'Spoiled Vouchers', icon: <FaBan /> },
+    { label: 'Saved Reports', icon: <FaSave /> },
+  ];
 
   return (
-    <div
-      onClick={() => navigate(path)}
-      className={`flex flex-col items-center gap-1 px-2 py-2 text-xs rounded-lg cursor-pointer transition-colors ${
-        isActive
-          ? 'bg-[#42A841] text-white font-semibold'
-          : 'hover:bg-[#42A841]/80 hover:text-[#ffffff]'
-      }`}
-    >
-      <Icon size={22} />
-      <span>{label}</span>
+    <div className="w-64 bg-white shadow-md h-full">
+      <div className="p-6 font-bold text-xl border-b">GAS - CASH DISBURSEMENT</div>
+      <nav className="p-4 space-y-2">
+        {menuItems.map((item, idx) => (
+          <div key={idx} className="flex items-center space-x-3 p-2 hover:bg-blue-100 rounded cursor-pointer text-gray-700">
+            <span className="text-lg">{item.icon}</span>
+            <span className="text-sm font-medium">{item.label}</span>
+          </div>
+        ))}
+      </nav>
     </div>
   );
-}
+};
+
+export default Sidebar;

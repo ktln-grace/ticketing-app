@@ -20,6 +20,7 @@ function Tickets() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedTicket, setSelectedTicket] = useState(null);
   const ticketsPerPage = 10;
 
   useEffect(() => {
@@ -31,6 +32,7 @@ function Tickets() {
         const data = await response.json();
         setTickets(data || []);
         setCurrentPage(1);
+        setSelectedTicket(null);
       } catch (error) {
         console.error('Error fetching tickets:', error);
       }
@@ -161,36 +163,98 @@ function Tickets() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedTickets.map((ticket, index) => (
-                      <TableRow key={index} className="hover:bg-gray-100">
+                  {paginatedTickets.map((ticket, index) => (
+                    <React.Fragment key={index}>
+                      {/* Main Ticket Row */}
+                      <TableRow className="hover:bg-gray-100">
                         <TableCell>{ticket.ticket_no}</TableCell>
-                        <TableCell>{ticket.subject}</TableCell>
+                        <TableCell
+                          onClick={() =>
+                            setSelectedTicket(
+                              selectedTicket?.ticket_no === ticket.ticket_no ? null : ticket
+                            )
+                          }
+                          className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                        >
+                          {ticket.subject}
+                        </TableCell>
                         <TableCell>
                           <span className="bg-blue-700 text-white text-9px px-2 py-1 rounded-md">
-                            {tabKey.charAt(0) + tabKey.slice(1).toLowerCase()}
+                            {activeTab.charAt(0) + activeTab.slice(1).toLowerCase()}
                           </span>
                         </TableCell>
                         <TableCell>{ticket.employee_name}</TableCell>
                         <TableCell>
-                          <span className={`text-9px px-2 py-1 rounded-md ${
-                            ticket.urgency === 'Urgent'
-                              ? 'bg-red-600 text-white'
-                              : 'bg-yellow-300 text-black'
-                          }`}>
+                          <span
+                            className={`text-9px px-2 py-1 rounded-md ${
+                              ticket.urgency === 'Urgent'
+                                ? 'bg-red-600 text-white'
+                                : 'bg-yellow-300 text-black'
+                            }`}
+                          >
                             {ticket.urgency || 'Normal'}
                           </span>
                         </TableCell>
                         <TableCell>
                           {new Date(
                             ticket.date_approved ||
-                            ticket.date_assigned ||
-                            ticket.datetime_closed ||
-                            ''
+                              ticket.date_assigned ||
+                              ticket.datetime_closed ||
+                              ''
                           ).toLocaleString()}
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
+
+                      {/* Expanded Detail Row */}
+                      {selectedTicket?.ticket_no === ticket.ticket_no && (
+                        <TableRow>
+                          <TableCell colSpan={6}>
+                            <div className="bg-gray-50 p-4 rounded-lg text-left space-y-2 text-sm">
+                              <p>
+                                <strong>Subject:</strong> {ticket.subject}
+                              </p>
+                              <p>
+                                <strong>Employee Name:</strong> {ticket.employee_name}
+                              </p>
+                              <p>
+                                <strong>Status:</strong> {ticket.status}
+                              </p>
+                              <p>
+                                <strong>Urgency:</strong> {ticket.urgency}
+                              </p>
+                              <p>
+                                <strong>Description:</strong>{' '}
+                                {ticket.description || '—'}
+                              </p>
+                              <p>
+                                <strong>Date Submitted:</strong>{' '}
+                                {new Date(
+                                  ticket.date_approved ||
+                                    ticket.date_assigned ||
+                                    ticket.datetime_closed ||
+                                    ''
+                                ).toLocaleString()}
+                              </p>
+                              <p>
+                                <strong>Attachments:</strong>{' '}
+                                {ticket.attachment_count > 0
+                                  ? `${ticket.attachment_count} file(s)`
+                                  : 'None'}
+                              </p>
+                              <button
+                                onClick={() => setSelectedTicket(null)}
+                                className="mt-4 px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </TableBody>
+
                 </Table>
               )}
 
@@ -209,6 +273,7 @@ function Tickets() {
                 </div>
               </div>
             </div>
+
           </Tabs.Content>
         ))}
       </Tabs.Root>
