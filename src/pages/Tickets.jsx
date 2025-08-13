@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
+import TicketViewer from './TicketViewer';
 import {
   Table,
   TableHead,
@@ -69,7 +70,7 @@ function Tickets() {
   );
 
   return (
-    <main className="flex-1 p-2 space-y-6">
+    <main className="flex-1 p-2">
       <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
         {/* Tab Triggers and Filters */}
         <div className="flex justify-between items-center flex-wrap gap-4">
@@ -147,7 +148,7 @@ function Tickets() {
         {/* Tab Content */}
         {['APPROVED', 'ASSIGNED', 'CLOSED'].map((tabKey) => (
           <Tabs.Content key={tabKey} value={tabKey} className="mt-6">
-            <div className="overflow-x-auto bg-white border shadow-sm rounded-xl p-4">
+            <div className="overflow-visible bg-white border shadow-sm rounded-xl p-4">
               {paginatedTickets.length === 0 ? (
                 <div className="text-center py-10 text-gray-500">No tickets found for this tab.</div>
               ) : (
@@ -162,21 +163,21 @@ function Tickets() {
                       <TableHead>Date</TableHead>
                     </TableRow>
                   </TableHeader>
+
                   <TableBody>
-                  {paginatedTickets.map((ticket, index) => (
-                    <React.Fragment key={index}>
-                      {/* Main Ticket Row */}
-                      <TableRow className="hover:bg-gray-100">
+                    {paginatedTickets.map((ticket, index) => (
+                      <TableRow key={index} className="hover:bg-gray-100">
                         <TableCell>{ticket.ticket_no}</TableCell>
-                        <TableCell
-                          onClick={() =>
-                            setSelectedTicket(
-                              selectedTicket?.ticket_no === ticket.ticket_no ? null : ticket
-                            )
-                          }
-                          className="text-blue-600 underline cursor-pointer hover:text-blue-800"
-                        >
-                          {ticket.subject}
+                        <TableCell>
+                          <button
+                            onClick={() => {
+                              console.log('Clicked:', ticket);
+                              setSelectedTicket(ticket);
+                            }}
+                            className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                          >
+                            {ticket.subject || 'No Subject'}
+                          </button>
                         </TableCell>
                         <TableCell>
                           <span className="bg-blue-700 text-white text-9px px-2 py-1 rounded-md">
@@ -204,57 +205,8 @@ function Tickets() {
                           ).toLocaleString()}
                         </TableCell>
                       </TableRow>
-
-                      {/* Expanded Detail Row */}
-                      {selectedTicket?.ticket_no === ticket.ticket_no && (
-                        <TableRow>
-                          <TableCell colSpan={6}>
-                            <div className="bg-gray-50 p-4 rounded-lg text-left space-y-2 text-sm">
-                              <p>
-                                <strong>Subject:</strong> {ticket.subject}
-                              </p>
-                              <p>
-                                <strong>Employee Name:</strong> {ticket.employee_name}
-                              </p>
-                              <p>
-                                <strong>Status:</strong> {ticket.status}
-                              </p>
-                              <p>
-                                <strong>Urgency:</strong> {ticket.urgency}
-                              </p>
-                              <p>
-                                <strong>Description:</strong>{' '}
-                                {ticket.description || '—'}
-                              </p>
-                              <p>
-                                <strong>Date Submitted:</strong>{' '}
-                                {new Date(
-                                  ticket.date_approved ||
-                                    ticket.date_assigned ||
-                                    ticket.datetime_closed ||
-                                    ''
-                                ).toLocaleString()}
-                              </p>
-                              <p>
-                                <strong>Attachments:</strong>{' '}
-                                {ticket.attachment_count > 0
-                                  ? `${ticket.attachment_count} file(s)`
-                                  : 'None'}
-                              </p>
-                              <button
-                                onClick={() => setSelectedTicket(null)}
-                                className="mt-4 px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
-                              >
-                                Close
-                              </button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-
+                    ))}
+                  </TableBody>
                 </Table>
               )}
 
@@ -273,12 +225,16 @@ function Tickets() {
                 </div>
               </div>
             </div>
-
           </Tabs.Content>
         ))}
       </Tabs.Root>
+      {selectedTicket && (
+        <TicketViewer
+          ticket={selectedTicket}
+          onClose={() => setSelectedTicket(null)}
+        />
+      )}
     </main>
   );
 }
-
 export default Tickets;
