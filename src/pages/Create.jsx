@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
-import {
-  Select,
-  SelectTrigger,
-  SelectItem,
-  SelectContent,
-  SelectValue,
-} from '../components/ui/select';
 import { Textarea } from '../components/ui/textarea';
-import { 
+import {
   PaperclipIcon,
   UserIcon,
   SearchIcon,
- } from 'lucide-react';
+} from 'lucide-react';
 
 function Create() {
   const [formData, setFormData] = useState({
@@ -27,7 +20,6 @@ function Create() {
 
   const [createdTickets, setCreatedTickets] = useState([]);
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     const newTicket = {
@@ -35,7 +27,7 @@ function Create() {
       id: Date.now(),
       dateCreated: new Date().toLocaleString(),
     };
-    setCreatedTickets((prev) => [...prev, newTicket]); // Add to end for oldest on top
+    setCreatedTickets((prev) => [...prev, newTicket]);
     setFormData({
       requestBy: '',
       urgency: '',
@@ -48,26 +40,25 @@ function Create() {
 
   return (
     <main className="flex-1 p-2">
-            {/* Header */}
-          <div className="flex justify-between items-center flex-wrap gap-6 mb-4">
-            <h1 className="text-4xl font-bold text-[#000000]">CREATE A TICKET</h1>
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="relative w-72 gap-1">
-                <SearchIcon className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                <Input
-                  placeholder="Search Ticket No. or Subject"
-                  className="pl-10 pr-3 py-2 rounded-xl border border-gray-300 shadow-sm w-full"
-                />
-              </div>
-              <div className="flex items-center gap-1 font-medium text-gray-800 bg-white rounded-xl border w-70 px-3 py-2 border-gray-300 shadow-sm">
-                <UserIcon size={18} />
-                <span>Katelene Grace S. Paloma</span>
-              </div>
-            </div>
+      {/* Header */}
+      <div className="flex justify-between items-center flex-wrap gap-6 mb-4">
+        <h1 className="text-4xl font-bold text-[#000000]">CREATE A TICKET</h1>
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="relative w-72 gap-1">
+            <SearchIcon className="absolute left-3 top-2.5 text-gray-400" size={18} />
+            <Input
+              placeholder="Search Ticket No. or Subject"
+              className="pl-10 pr-3 py-2 rounded-xl border border-gray-300 shadow-sm w-full"
+            />
           </div>
+          <div className="flex items-center gap-1 font-medium text-gray-800 bg-white rounded-xl border w-70 px-3 py-2 border-gray-300 shadow-sm">
+            <UserIcon size={18} />
+            <span>Katelene Grace S. Paloma</span>
+          </div>
+        </div>
+      </div>
 
-          {/* Divider */}
-          <hr className="border border-gray-300 mb-6" />
+      <hr className="border border-gray-300 mb-6" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Form */}
@@ -87,30 +78,30 @@ function Create() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Urgency</label>
-              <Select onValueChange={(value) => setFormData({ ...formData, urgency: value })} value={formData.urgency}>
-                <SelectTrigger className="w-full border rounded-md px-3 py-2 text-sm text-gray-700 bg-white">
-                  <SelectValue placeholder="Select urgency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Normal">Normal</SelectItem>
-                  <SelectItem value="Urgent">Urgent</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                value={formData.urgency}
+                onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select urgency</option>
+                <option value="Normal">Normal</option>
+                <option value="Urgent">Urgent</option>
+              </select>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Category</label>
-              <Select onValueChange={(value) => setFormData({ ...formData, category: value })} value={formData.category}>
-                <SelectTrigger className="w-full border rounded-md px-3 py-2 text-sm text-gray-700 bg-white">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Issue DM/CM">Issue DM/CM</SelectItem>
-                  <SelectItem value="Access Request">Access Request</SelectItem>
-                  <SelectItem value="System Error">System Error</SelectItem>
-                  <SelectItem value="Others">Others</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select category</option>
+                <option value="Issue DM/CM">Issue DM/CM</option>
+                <option value="Access Request">Access Request</option>
+                <option value="System Error">System Error</option>
+                <option value="Others">Others</option>
+              </select>
             </div>
           </div>
 

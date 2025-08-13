@@ -51,10 +51,6 @@ function TicketViewer({ ticket, onClose }) {
         </div>
         </div>
 
-
-
-
-
         {/* Ticket Info Section */}
         <div className="bg-gray-50 border border-gray-200 rounded-lg mb-6">
           <table className="w-full text-sm text-gray-800">
@@ -65,8 +61,7 @@ function TicketViewer({ ticket, onClose }) {
                 ['Create Date', ticket.date_created || 'N/A'],
                 ['Approved Date', ticket.date_approved || 'N/A'],
                 ['Subject', ticket.subject],
-                ['Concern', ticket.concern || 'Request a Service'],
-                ['Request', ticket.request_type || 'Issue DM/CM'],
+                ['Category', ticket.category || 'Request a Service'],
               ].map(([label, value], idx) => (
                 <tr key={idx}>
                   <td className="font-semibold bg-gray-100 px-4 py-2 w-1/3">{label}</td>
@@ -96,7 +91,7 @@ function TicketViewer({ ticket, onClose }) {
 
         {/* Assignment Section */}
           <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To:</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Assigned To:</label>
             <select
               value={assignee}
               onChange={(e) => setAssignee(e.target.value)}
@@ -108,7 +103,6 @@ function TicketViewer({ ticket, onClose }) {
               <option value="Technician C">Technician C</option>
             </select>
           </div>
-
           <div>
             <select
               value={apiSelection}
@@ -121,7 +115,6 @@ function TicketViewer({ ticket, onClose }) {
               <option value="API C">API C</option>
             </select>
           </div>
-        
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3">
@@ -139,11 +132,9 @@ function TicketViewer({ ticket, onClose }) {
           <Button
             variant="outline"
             onClick={handleReject}
-            className="bg-red-600 text-white hover:bg-red-700 flex items-center gap-2 transition"
-          >
+            className="bg-red-600 text-white hover:bg-red-700 flex items-center gap-2 transition">
             <XIcon size={16} /> Reject 
           </Button>
-
         </div>
       </div>
     </div>

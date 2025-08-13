@@ -24,22 +24,26 @@ function Tickets() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const ticketsPerPage = 10;
 
-  useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        const response = await fetch(
-          `http://10.10.20.59/gibco_ticket/api/get-tickets.php?status=${activeTab}`
-        );
-        const data = await response.json();
-        setTickets(data || []);
-        setCurrentPage(1);
-        setSelectedTicket(null);
-      } catch (error) {
-        console.error('Error fetching tickets:', error);
-      }
-    };
-    fetchTickets();
-  }, [activeTab]);
+useEffect(() => {
+  console.log('Fetching tickets for status:', activeTab); // 👈 Add this line
+
+  const fetchTickets = async () => {
+    try {
+      const response = await fetch(
+        `http://10.10.20.59/gibco_ticket/api/get-tickets.php?status=${activeTab}`
+      );
+      const data = await response.json();
+      setTickets(data || []);
+      setCurrentPage(1);
+      setSelectedTicket(null);
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+    }
+  };
+
+  fetchTickets();
+}, [activeTab]);
+
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchesUrgency = selectedUrgency
@@ -174,7 +178,7 @@ function Tickets() {
                               console.log('Clicked:', ticket);
                               setSelectedTicket(ticket);
                             }}
-                            className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                            className="text-blue-600 cursor-pointer hover:text-blue-800 hover:underline"
                           >
                             {ticket.subject || 'No Subject'}
                           </button>
