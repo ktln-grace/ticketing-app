@@ -25,7 +25,7 @@ function Tickets() {
   const ticketsPerPage = 10;
 
 useEffect(() => {
-  console.log('Fetching tickets for status:', activeTab); // 👈 Add this line
+  console.log('Fetching tickets for status:', activeTab); 
 
   const fetchTickets = async () => {
     try {
@@ -53,7 +53,7 @@ useEffect(() => {
       ? (
           ticket.date_approved ||
           ticket.date_assigned ||
-          ticket.datetime_closed ||
+          ticket.datetime_done ||
           ''
         ).startsWith(selectedDate)
       : true;
@@ -163,6 +163,7 @@ useEffect(() => {
                       <TableHead>Subject</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>From</TableHead>
+                      {['ASSIGNED', 'CLOSED'].includes(activeTab) && <TableHead>Assigned To</TableHead>}
                       <TableHead>Urgency</TableHead>
                       <TableHead>Date</TableHead>
                     </TableRow>
@@ -189,22 +190,22 @@ useEffect(() => {
                           </span>
                         </TableCell>
                         <TableCell>{ticket.employee_name}</TableCell>
-                        <TableCell>
-                          <span
-                            className={`text-9px px-2 py-1 rounded-md ${
-                              ticket.urgency === 'Urgent'
-                                ? 'bg-red-600 text-white'
-                                : 'bg-yellow-300 text-black'
-                            }`}
-                          >
-                            {ticket.urgency || 'Normal'}
-                          </span>
-                        </TableCell>
+
+                                {['ASSIGNED', 'CLOSED'].includes(activeTab) && (
+                                  <TableCell>{ticket.assigned_to || '—'}</TableCell>
+                                )}
+
+                                <TableCell>
+                                  <span className={`...`}>
+                                    {ticket.urgency || 'Normal'}
+                                  </span>
+                                </TableCell>
+
                         <TableCell>
                           {new Date(
                             ticket.date_approved ||
                               ticket.date_assigned ||
-                              ticket.datetime_closed ||
+                              ticket.datetime_done ||
                               ''
                           ).toLocaleString()}
                         </TableCell>
