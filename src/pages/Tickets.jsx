@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableBody,
 } from '../components/ui/table';
-import { CalendarIcon, SearchIcon } from 'lucide-react';
+import { CalendarIcon, SearchIcon, Weight } from 'lucide-react';
 
 function Tickets() {
   const [tickets, setTickets] = useState([]);
@@ -77,6 +77,22 @@ useEffect(() => {
     (currentPage - 1) * ticketsPerPage,
     currentPage * ticketsPerPage
   );
+
+  function toProperCase(name) {
+  return name
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+const statusStyles = {
+  APPROVED: 'bg-blue-700',
+  ASSIGNED: 'bg-yellow-500',
+  CLOSED: 'bg-green-700',
+  REJECTED: 'bg-red-700',
+};
+
 
   return (
     <main className="flex-1 p-2">
@@ -189,17 +205,24 @@ useEffect(() => {
                             {ticket.subject || 'No Subject'}
                           </button>
                         </TableCell>
-                        <TableCell>
-                          <span className="bg-blue-700 text-white text-9px px-2 py-1 rounded-md">
-                            {activeTab.charAt(0) + activeTab.slice(1).toLowerCase()}
-                          </span>
-                        </TableCell>
-                        <TableCell>{ticket.employee_name}</TableCell>
+                          <TableCell>
+                            <span className={`${statusStyles[activeTab] || 'bg-gray-500'} text-white text-9px px-2 py-1 rounded-md`}>
+                              {activeTab.charAt(0) + activeTab.slice(1).toLowerCase()}
+                            </span>
+                          </TableCell>
+                        <TableCell>{toProperCase(ticket.employee_name)}</TableCell>
 
-                                {['ASSIGNED', 'CLOSED'].includes(activeTab) && (
-                                  <TableCell>{ticket.assigned_to || '—'}</TableCell>
-                                )}
-
+                        {['ASSIGNED', 'CLOSED'].includes(activeTab) && (
+                          <TableCell>  {ticket.assigned_to ? (
+                                <div
+                                  style={{
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  {toProperCase(ticket.assigned_to)}
+                                </div>
+                              ) : '—'}</TableCell>
+                        )}
                                 <TableCell>
                                   <span className={`...`}>
                                     {ticket.urgency || 'Normal'}
