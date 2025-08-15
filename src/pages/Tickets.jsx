@@ -26,24 +26,29 @@ function Tickets() {
 
 useEffect(() => {
   console.log('Fetching tickets for status:', activeTab); 
+  setTickets([]); // Clear previous tab's data immediately
 
   const fetchTickets = async () => {
     try {
       const response = await fetch(
         `http://10.10.20.59/gibco_ticket/api/get-tickets.php?status=${activeTab}`
       );
-      const data = await response.json();
-      setTickets(data || []);
+
+      const text = await response.text(); // Read raw response
+      console.log('Raw response:', text);
+
+      const data = text ? JSON.parse(text) : []; // Safely parse
+      setTickets(Array.isArray(data) ? data : []);
       setCurrentPage(1);
       setSelectedTicket(null);
     } catch (error) {
       console.error('Error fetching tickets:', error);
+      setTickets([]); // Ensure UI clears on error
     }
   };
 
   fetchTickets();
 }, [activeTab]);
-
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchesUrgency = selectedUrgency
