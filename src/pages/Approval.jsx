@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TicketViewer from './TicketViewer'; // Adjust path if needed
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
@@ -20,7 +21,16 @@ function Approval() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+    const [selectedTicket, setSelectedTicket] = useState(null);
   const ticketsPerPage = 10;
+
+  function toProperCase(name) {
+  return name
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
 
   // Fetch FOR APPROVAL tickets
   useEffect(() => {
@@ -157,17 +167,26 @@ function Approval() {
                 <TableHead>Date Requested</TableHead>
               </TableRow>
             </TableHeader>
+            
             <TableBody>
               {paginatedTickets.map((ticket, index) => (
                 <TableRow key={index} className="hover:bg-gray-100">
                   <TableCell>{ticket.ticket_no}</TableCell>
-                  <TableCell>{ticket.subject}</TableCell>
+                  <TableCell><button
+                            onClick={() => {
+                              console.log('Clicked:', ticket);
+                              setSelectedTicket(ticket);
+                            }}
+                            className="text-blue-600 cursor-pointer hover:text-blue-800 hover:underline"
+                          >
+                            {ticket.subject || 'No Subject'}
+                          </button></TableCell>
                   <TableCell>
                     <span className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-md">
                       For Approval
                     </span>
                   </TableCell>
-                  <TableCell>{ticket.employee_name}</TableCell>
+                  <TableCell>{toProperCase(ticket.employee_name)}</TableCell>
                   <TableCell>
                     <span className={`text-xs px-2 py-1 rounded-md ${
                       ticket.urgency === 'Urgent' ? 'bg-red-600 text-white' : 'bg-yellow-300 text-black'
@@ -197,6 +216,12 @@ function Approval() {
           </div>
         </div>
       </div>
+      {selectedTicket && (
+        <TicketViewer
+          ticket={selectedTicket}
+          onClose={() => setSelectedTicket(null)}
+        />
+      )}
     </main>
   );
 }

@@ -7,16 +7,7 @@ function TicketViewer({ ticket, onClose }) {
   const [kpiSelection, setKpiSelection] = useState('');
   const [kpiOptions, setKpiOptions] = useState([]);
 
-  const assigneeOptions = [
-    'AMADEO LUCERO',
-    'ASMIA ALI',
-    'EARL GRANT PESEBRE',
-    'FJ ROQUE',
-    'JUNREL PEPITO',
-    'KATELENE GRACE PALOMA',
-    'LUIGIE SALDO ABAYA',
-    'TRICIAN CAMILLE BANDE'
-  ];
+  const assigneeOptions = [/* same as before */];
 
   useEffect(() => {
     fetch('/get-kpis.php')
@@ -25,20 +16,52 @@ function TicketViewer({ ticket, onClose }) {
       .catch(err => console.error('Error fetching KPIs:', err));
   }, []);
 
-  const handleAssign = () => {
-    console.log('Assigning to:', assignee);
-    console.log('Selected KPI:', kpiSelection);
-    // TODO: Send to backend via fetch or axios
-    onClose();
+  const handleAssign = async () => {
+    try {
+      const res = await fetch('/api/assign-ticket.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticket_no: ticket.ticket_no,
+          assigned_to: assignee,
+          kpi: kpiSelection,
+        }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert(`Ticket #${ticket.ticket_no} assigned to ${assignee}`);
+        onClose();
+      } else {
+        alert(`Failed to assign: ${result.message}`);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error assigning ticket');
+    }
   };
 
-  const handleReject = () => {
-    console.log('Rejecting ticket:', ticket.ticket_no);
-    onClose();
+  const handleReject = async () => {
+    try {
+      const res = await fetch('/api/reject-ticket.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticket_no: ticket.ticket_no }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert(`Ticket #${ticket.ticket_no} rejected`);
+        onClose();
+      } else {
+        alert(`Failed to reject: ${result.message}`);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error rejecting ticket');
+    }
   };
 
   const status = ticket.status?.toLowerCase();
-  const isApproved = status === 'approved';
+  const isApproved = status === 'approved' || status === 'for approval';
   const isAssigned = status === 'assigned';
 
   return (
@@ -101,7 +124,9 @@ function TicketViewer({ ticket, onClose }) {
           <table className="w-full text-sm text-gray-800">
             <tbody>
               <tr>
-                <td className="px-4 py-2">{ticket.message || '—'}</td>
+                <td className="px-4 py-2 whitespace-pre-wrap font-sans">
+                  {ticket.message || '—'}
+                </td>
               </tr>
             </tbody>
           </table>
